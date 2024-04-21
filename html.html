@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra de boletos de autobús - Tuxtla a Dubai</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .message {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compra de boletos de autobús - Tuxtla a Dubai</h1>
+        <form id="ticketForm">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" required><br>
+            <label for="apellidoPaterno">Apellido Paterno:</label>
+            <input type="text" id="apellidoPaterno" required><br>
+            <label for="apellidoMaterno">Apellido Materno:</label>
+            <input type="text" id="apellidoMaterno" required><br>
+            <label for="edad">Edad:</label>
+            <input type="number" id="edad" required><br>
+            <label for="asiento">Número de Asiento:</label>
+            <input type="number" id="asiento" min="1" required><br>
+            <span class="message" id="errorMessage"></span>
+            <input type="submit" value="Comprar Boleto">
+        </form>
+
+        <h2>Listado de Pasajeros</h2>
+        <table id="pasajeros">
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido Paterno</th>
+                <th>Apellido Materno</th>
+                <th>Edad</th>
+                <th>Número de Asiento</th>
+            </tr>
+        </table>
+
+        <h2>Total de Asientos Vendidos: <span id="totalAsientos">0</span></h2>
+        <h2>Dinero Recaudado: <span id="dineroRecaudado">$0</span></h2>
+    </div>
+
+    <script>
+        var pasajeros = [];
+        var precioBoleto = 20000;
+
+        function comprarBoleto(event) {
+            event.preventDefault(); // Evitar que el formulario se envíe
+
+            var nombre = document.getElementById("nombre").value;
+            var apellidoPaterno = document.getElementById("apellidoPaterno").value;
+            var apellidoMaterno = document.getElementById("apellidoMaterno").value;
+            var edad = document.getElementById("edad").value;
+            var asiento = parseInt(document.getElementById("asiento").value);
+
+            // Validar que el número de asiento no esté ocupado
+            var asientoOcupado = pasajeros.some(function(pasajero) {
+                return pasajero.asiento === asiento;
+            });
+
+            if (asientoOcupado) {
+                document.getElementById("errorMessage").textContent = "¡El número de asiento ya está ocupado!";
+                return;
+            }
+
+            pasajeros.push({
+                nombre: nombre,
+                apellidoPaterno: apellidoPaterno,
+                apellidoMaterno: apellidoMaterno,
+                edad: edad,
+                asiento: asiento
+            });
+
+            pasajeros.sort((a, b) => (a.apellidoPaterno > b.apellidoPaterno) ? 1 : ((b.apellidoPaterno > a.apellidoPaterno) ? -1 : 0));
+
+            mostrarPasajeros();
+            actualizarTotales();
+            document.getElementById("errorMessage").textContent = "";
+        }
+
+        function mostrarPasajeros() {
+            var table = document.getElementById("pasajeros");
+            table.innerHTML = "<tr><th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th><th>Edad</th><th>Número de Asiento</th></tr>";
+
+            for (var i = 0; i < pasajeros.length; i++) {
+                var pasajero = pasajeros[i];
+                var row = `<tr><td>${pasajero.nombre}</td><td>${pasajero.apellidoPaterno}</td><td>${pasajero.apellidoMaterno}</td><td>${pasajero.edad}</td><td>${pasajero.asiento}</td></tr>`;
+                table.innerHTML += row;
+            }
+        }
+
+        function actualizarTotales() {
+            var totalAsientosVendidos = pasajeros.length;
+            var dineroRecaudado = totalAsientosVendidos * precioBoleto;
+
+            document.getElementById("totalAsientos").innerText = totalAsientosVendidos;
+            document.getElementById("dineroRecaudado").innerText = "$" + dineroRecaudado;
+        }
+
+        document.getElementById("ticketForm").addEventListener("submit", comprarBoleto);
+    </script>
+</body>
+</html>
